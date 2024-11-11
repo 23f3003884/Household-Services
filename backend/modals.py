@@ -1,9 +1,11 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
+from flask_login import UserMixin
+
 
 db = SQLAlchemy()
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer(), primary_key=True)
     email = db.Column(db.String(60), unique=True, nullable=False)
     password = db.Column(db.String(), nullable=False)
@@ -15,6 +17,9 @@ class User(db.Model):
     service_requests = db.relationship("ServiceRequest", cascade="all, delete", backref="customer", lazy=True) # For accessing all the service requests created by a user(customer)
     professional_info = db.relationship("Professional", cascade="all, delete", backref="user", uselist=False) # one to one relation for accessing futher professional info 
 
+    # Make every first leter of word capitalized
+    def capitalised_name(self):
+        return self.name.title()
 
 class Professional(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
