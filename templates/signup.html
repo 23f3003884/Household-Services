@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Signup
+{% endblock %}
+
+{% block content %}
+<div class="main">
+    <div class="d-flex flex-column  align-items-center mt-4">
+        <div class="d-flex align-items-center mb-3">
+            <span class="me-2" style="font-size: 30px;">SIGNUP</span>
+            <img src="/static/image/icons/person-add.svg">
+        </div>
+        <div>
+            <!-- Email area -->
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">@</span>
+                <input type="email" class="form-control" placeholder="Email" aria-label="Username" aria-describedby="basic-addon1">
+            </div>
+            <!-- Password area-->
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">
+                    <img src="/static/image/icons/key.svg">
+                </span>
+                <input type="password" class="form-control" placeholder="Password"  aria-describedby="passwordHelpBlock">
+            </div>
+            <!-- Full Name -->
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">
+                    <img src="/static/image/icons/letters.svg">
+                </span>
+                <input type="email" class="form-control" placeholder="Full Name" aria-label="Username" aria-describedby="basic-addon1">
+            </div>
+            <!-- Address -->
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">
+                    <img src="/static/image/icons/home.svg">
+                </span>
+                <input type="email" class="form-control" placeholder="Address" aria-label="Username" aria-describedby="basic-addon1">
+            </div>
+            <!-- Pin Code -->
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">
+                    <img src="/static/image/icons/pin.svg">
+                </span>
+                <input type="email" class="form-control" placeholder="Pin Code" aria-label="Username" aria-describedby="basic-addon1">
+            </div>
+            
+        </div>
+        <!-- Submit button and login link-->
+        <button type="button" class="btn btn-primary ">Signup</button>
+        <p>Already a user?<a href="{{ url_for('login_page') }}">Login</a></p>
+    </div>
+    
+</div>
+{% endblock %}

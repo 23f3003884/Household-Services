@@ -1,36 +1,14 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Login</title>
-        <link rel="stylesheet" href="/static/styles/login-style.css">
-    </head>
-    <body>
-        <div class="main">
-            <div class="header">
-                <div class="header-start">
-                    A - Z Household Services
-                </div>
-                <div>Register as profestional</div>
-            </div>
-            <div class="middle">
-                <div class="pair">
-                    <div >Registered Email ID:</div> 
-                    <div ><input type="text"/></div>
-                </div>
-                <div class="pair">
-                    <div >Password:</div> 
-                    <div ><input type="text"/></div>
-                </div>
-            </div>
-            <div class="footer">
-                <div>
-                    <button>Login</button>
-                </div>
-                <div>
-                    Create Account?
-                </div>
-            </div>
-        </div>
+{% extends "base.html" %}
 
-    </body>
-</html>
+{% block title %}
+    Home
+{% endblock%}
+
+{% block content %}
+    <div class="main">
+        <h1>Welcome to A-Z Household SERVICES</h1>
+        <h5>We provide you more than a service.</h5>
+        <h6>We provide you a family. A family of professionals.</h6>
+        <a href="{{ url_for('signup_page')}}">Get Started</a>
+    </div>
+{% endblock %}
