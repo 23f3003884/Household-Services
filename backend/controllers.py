@@ -38,7 +38,30 @@ def login_page():
 @app.route("/admin")
 @login_required
 def admin_page():
-    return render_template("admin_dashboard.html")
+    services = Service.query.all()
+    return render_template("admin_dashboard.html", services=services)
+
+# Route for adding a service 
+@app.route("/add_Service", methods=["GET", "POST"])
+def add_service():
+    if request.method == "POST":
+        name = request.form.get("name")
+        desc = request.form.get("desc")
+        price = request.form.get("price")
+        time_required = request.form.get("time_required")
+        try:
+            new_service = Service(name=name, desc=desc, price=price, time_required=time_required)
+            db.session.add(new_service)
+            db.session.commit()
+            flash("Service added successfully.", category="info")
+        
+            return redirect(url_for("admin_page"))
+        except:
+            db.session.rollback()
+            flash("Something went wrong.", category="danger")
+
+    return render_template("add_service.html")
+
 
 # User dashboard
 @app.route("/user")

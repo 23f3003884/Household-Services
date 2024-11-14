@@ -1,0 +1,29 @@
+<!-- Table of all the services that are avaliable-->
+<table class="table mt-2">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Service Name</th>
+        <th scope="col">Description</th>
+        <th scope="col">Price</th>
+        <th scope="col">Time Required</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for service in services %}
+            <tr>
+                <th scope="row">{{service.id}}</th>
+                <td>{{service.capitalised_name()}}</td>
+                <td>{{service.desc}}</td>
+                <td>&#8377;{{service.price}}</td>
+                <td>{{service.time_required}} Hrs.</td>
+                <td>
+                    <a href="{{ url_for('add_service') }}"><button class="btn btn-outline-primary">Edit</button></a>
+                    <button class="btn btn-outline-danger">Delete</button>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{{ url_for('add_service') }}"><button class="btn btn-primary">Add Service</button></a>

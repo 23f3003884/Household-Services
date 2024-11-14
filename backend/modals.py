@@ -40,6 +40,9 @@ class Service(db.Model):
     # Relations
     service_requests = db.relationship("ServiceRequest", cascade="all, delete", backref="services", lazy=True) # For accessing all the service requests having common service
 
+    # Make every first leter of word capitalized
+    def capitalised_name(self):
+        return self.name.title()
 
 class ServiceRequest(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
