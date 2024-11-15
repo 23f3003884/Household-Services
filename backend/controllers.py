@@ -3,7 +3,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from flask import current_app as app
 from backend.modals import *
 
-
+# Home page
 @app.route("/")
 def home_page():
     return render_template('index.html')
@@ -41,7 +41,7 @@ def admin_page():
     services = Service.query.filter_by(status=1)
     return render_template("admin_dashboard.html", services=services)
 
-# Route for adding a service 
+# Adding a service 
 @app.route("/add_service", methods=["GET", "POST"])
 def add_service():
     if request.method == "POST":
@@ -63,7 +63,7 @@ def add_service():
     return render_template("add_service.html")
 
 
-# Route for editing a service 
+# Editing a service 
 @app.route("/edit_service/<service_id>", methods=["GET", "POST"])
 def edit_service(service_id):
     service = get_service_obj(service_id) # 0:None, Other than 0:means data present therfore UPDATE 
@@ -89,7 +89,7 @@ def edit_service(service_id):
     
     return render_template("edit_service.html", service=service)
 
-# Route for deleting(deactivating) a service
+# Deleting(deactivating) a service
 @app.route("/delete_service/<service_id>")
 def delete_service(service_id):
     service = get_service_obj(service_id)
@@ -111,15 +111,18 @@ def professional_page():
     return render_template("professional_dashboard.html")
 
 
+# Customer registration
 @app.route("/signup")
 def signup_page():
     return render_template("signup.html")
 
+# Professional registration
 @app.route("/professional_signup")
 def professional_signup_page():
-    return render_template("professional_signup.html")
+    services = Service.query.filter_by(status=1) # Passed for sevice type selection by a professional
+    return render_template("professional_signup.html", services=services)
 
-# Route for new user registration
+# New user registration
 @app.route("/customer_registration", methods=["GET", "POST"])
 def customer_registration_page():
     if request.method == "POST":
@@ -137,9 +140,42 @@ def customer_registration_page():
 
             return redirect(url_for("login_page"))
         except:
+            db.session.rollback()
             flash("Something went wrong. Try again!!!", category="danger")
 
     return redirect(url_for("signup_page"))
+
+# New professional registration
+@app.route("/professional_registration", methods=["GET", "POST"])
+def professional_registration_page():
+    if request.method == "POST":
+        # Grabing data form form
+        role = 2 # For Professionals
+        email = request.form.get("email")
+        password = request.form.get("password")
+        name = request.form.get("name")
+        service_type = request.form.get("service_type")
+        experience = request.form.get("experience")
+        address = request.form.get("address")
+        pincode = request.form.get("pincode")
+        # Setting up new user
+        try:
+            # First creating a user then using it id to make a professional
+            new_user = User(email=email, password=password, name=name, address=address, pincode=pincode, role=role)
+            db.session.add(new_user)
+            db.session.flush() # To get user.id 
+            # professional created
+            new_pro = Professional(user_id=new_user.id, service_type=service_type, experience=experience)
+            db.session.add(new_pro)
+            db.session.commit()
+            flash("Professional account created successfuly", category="info")
+
+            return redirect(url_for("login_page"))
+        except:
+            db.session.rollback()
+            flash("Something went wrong. Try again!!!", category="danger")
+
+    return redirect(url_for("professional_signup_page"))
 
 
 # Logout route
