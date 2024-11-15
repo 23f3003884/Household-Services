@@ -39,7 +39,8 @@ def login_page():
 @login_required
 def admin_page():
     services = Service.query.filter_by(status=1)
-    return render_template("admin_dashboard.html", services=services)
+    profesionals = User.query.filter_by(role=2)
+    return render_template("admin_dashboard.html", services=services, profesionals=profesionals)
 
 # Adding a service 
 @app.route("/add_service", methods=["GET", "POST"])
@@ -98,6 +99,23 @@ def delete_service(service_id):
     flash("Service deleted", category="danger")
 
     return redirect(url_for("admin_page"))
+
+# Toggle funtionality for blocking/unblocking of Users
+@app.route("/professional_status/<user_id>", methods=["GET", "POST"])
+def status_changer(user_id):
+    if request.method == "POST":
+        user = User.query.filter_by(id=user_id).first()
+        if user.status: # status = 1
+            user.status = 0
+        else:
+            user.status = 1
+        db.session.commit()
+
+        return redirect(url_for("admin_page"))
+    return redirect(url_for("admin_page"))
+
+
+
 
 
 # User dashboard
@@ -158,10 +176,11 @@ def professional_registration_page():
         experience = request.form.get("experience")
         address = request.form.get("address")
         pincode = request.form.get("pincode")
+        status = 0
         # Setting up new user
         try:
             # First creating a user then using it id to make a professional
-            new_user = User(email=email, password=password, name=name, address=address, pincode=pincode, role=role)
+            new_user = User(email=email, password=password, name=name, address=address, pincode=pincode, role=role, status=status)
             db.session.add(new_user)
             db.session.flush() # To get user.id 
             # professional created
