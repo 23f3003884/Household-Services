@@ -15,15 +15,16 @@
             <tr>
                 <th scope="row">{{service.id}}</th>
                 <td>{{service.capitalised_name()}}</td>
-                <td>{{service.desc}}</td>
+                <td style="max-width: 600px;">{{service.desc}}</td>
                 <td>&#8377;{{service.price}}</td>
                 <td>{{service.time_required}} Hrs.</td>
                 <td>
-                    <a href="{{ url_for('add_service') }}"><button class="btn btn-outline-primary">Edit</button></a>
-                    <button class="btn btn-outline-danger">Delete</button>
+                    <a href="edit_service/{{service.id}}"><button class="btn btn-outline-primary">Edit</button></a>
+                    <a href="delete_service/{{service.id}}"><button class="btn btn-outline-danger">Delete</button></a>
                 </td>
             </tr>
         {% endfor %}
     </tbody>
 </table>
+<!-- Adds a new service -->
 <a href="{{ url_for('add_service') }}"><button class="btn btn-primary">Add Service</button></a>

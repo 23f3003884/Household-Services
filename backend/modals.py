@@ -13,6 +13,8 @@ class User(db.Model, UserMixin):
     name = db.Column(db.String(30), nullable=False)
     address = db.Column(db.String(100), nullable=False)
     pincode = db.Column(db.Integer(), nullable=False)
+    status = db.Column(db.Integer(), nullable=False, default=1) # 0-inactive, 1-active
+
     # Relations
     service_requests = db.relationship("ServiceRequest", cascade="all, delete", backref="customer", lazy=True) # For accessing all the service requests created by a user(customer)
     professional_info = db.relationship("Professional", cascade="all, delete", backref="user", uselist=False) # one to one relation for accessing futher professional info 
@@ -37,6 +39,8 @@ class Service(db.Model):
     desc = db.Column(db.String(500), nullable=False)
     time_required = db.Column(db.Integer(), nullable=False) # Time required (in Hrs)
     price = db.Column(db.Float(), nullable=False)
+    status = db.Column(db.Integer(), nullable=False, default=1) # 0-inactive, 1-active
+
     # Relations
     service_requests = db.relationship("ServiceRequest", cascade="all, delete", backref="services", lazy=True) # For accessing all the service requests having common service
 

@@ -38,11 +38,11 @@ def login_page():
 @app.route("/admin")
 @login_required
 def admin_page():
-    services = Service.query.all()
+    services = Service.query.filter_by(status=1)
     return render_template("admin_dashboard.html", services=services)
 
 # Route for adding a service 
-@app.route("/add_Service", methods=["GET", "POST"])
+@app.route("/add_service", methods=["GET", "POST"])
 def add_service():
     if request.method == "POST":
         name = request.form.get("name")
@@ -52,15 +52,52 @@ def add_service():
         try:
             new_service = Service(name=name, desc=desc, price=price, time_required=time_required)
             db.session.add(new_service)
-            db.session.commit()
             flash("Service added successfully.", category="info")
+            db.session.commit()
         
             return redirect(url_for("admin_page"))
         except:
-            db.session.rollback()
+            db.session.rollback() # If something goes wrong above it will undo that
             flash("Something went wrong.", category="danger")
-
+    
     return render_template("add_service.html")
+
+
+# Route for editing a service 
+@app.route("/edit_service/<service_id>", methods=["GET", "POST"])
+def edit_service(service_id):
+    service = get_service_obj(service_id) # 0:None, Other than 0:means data present therfore UPDATE 
+
+    if request.method == "POST":
+        name = request.form.get("name")
+        desc = request.form.get("desc")
+        price = request.form.get("price")
+        time_required = request.form.get("time_required")
+        try:
+            if service: # If there is a service obj then UPDATE 
+                service.name = name
+                service.desc = desc
+                service.price = price
+                service.time_required = time_required
+                flash("Service updated successfully.", category="info")
+                db.session.commit()
+           
+            return redirect(url_for("admin_page"))
+        except:
+            db.session.rollback() # If something goes wrong above it will undo that
+            flash("Something went wrong.", category="danger")
+    
+    return render_template("edit_service.html", service=service)
+
+# Route for deleting(deactivating) a service
+@app.route("/delete_service/<service_id>")
+def delete_service(service_id):
+    service = get_service_obj(service_id)
+    service.status = 0
+    db.session.commit()
+    flash("Service deleted", category="danger")
+
+    return redirect(url_for("admin_page"))
 
 
 # User dashboard
@@ -111,3 +148,12 @@ def logout():
     logout_user()
     flash("You have been loged out.", category="info")
     return redirect(url_for("home_page"))
+
+
+
+# Helper Funtions
+
+# Returns Service Obj
+def get_service_obj(service_id):
+    obj = Service.query.filter_by(id=service_id).first()
+    return obj
