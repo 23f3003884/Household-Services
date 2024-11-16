@@ -1,8 +1,48 @@
 {% extends "base.html" %}
 
 {% block title %}
-    Dashboard
+    User Dashboard
 {% endblock %}
 
 {% block content %}
+    <div class="main">
+        <!-- main-window-header -->
+        <div class="row">
+            <div class="input-group">
+                    <!-- Sevices & Requests Tabs-->
+                    <ul class="nav nav-pills" >
+                        <li class="nav-item">
+                            <form action="{{ url_for('user_page', button_state=1) }}" method="POST">
+                                <button style="border-radius: 0;" class="nav-link {{'active' if button_state}}" type="submit">Services</button>
+                            </form>
+                        </li>
+                        <li class="nav-item">
+                            <form action="{{ url_for('user_page', button_state=0) }}" method="POST">
+                                <button style="border-radius: 0;" class="nav-link {{'active' if button_state==0}}" type="submit">Requests</button>
+                            </form>
+                        </li>
+                    </ul>
+                    <!-- Search box -->
+                    <input style="width: 400px;" type="text" class="form-control ms-1" placeholder="Search">
+                    <!-- Search filter dropdowns-->
+                    <select class="form-select">
+                        <option selected>Select Filter</option>
+                        <option value="1">One</option>
+                        <option value="2">Two</option>
+                        <option value="3">Three</option>
+                      </select>
+                    <!-- Search Button-->
+                    <button style="border-radius: 0;" class="btn btn-outline-secondary" type="button">
+                        <img  src="/static/image/icons/search.svg">
+                    </button>
+            </div>
+        </div>
+        <!-- content -->
+        {% block subcontent %}
+        {% endblock %}
+        
+    </div>
+    <div style="height: 1000px;"></div>
+
+    
 {% endblock %}

@@ -52,10 +52,30 @@ class ServiceRequest(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     service_id = db.Column(db.Integer(), db.ForeignKey("service.id"), nullable=False) # Foreign Key - Service table
     customer_id = db.Column(db.Integer(), db.ForeignKey("user.id"), nullable=False) #Foreign key - from User(Customer) table
-    professional_id = db.Column(db.Integer(), db.ForeignKey("professional.id"), unique=True, nullable=False) # Foreign Key - Professional table, One professional for one job
-    start_date = db.Column(db.DateTime(), nullable=False, default=func.now())
+    professional_id = db.Column(db.Integer(), db.ForeignKey("professional.id"), nullable=True) # Foreign Key - Professional table, One professional for one job
+    start_date = db.Column(db.DateTime(), nullable=False, default=func.now()) # func.now():get current time
     end_date = db.Column(db.DateTime(), nullable=False)
-    status = db.Column(db.Integer(), nullable=False, default=0) # 0-requested, 1-assigned, 2-completed
+    status = db.Column(db.Integer(), nullable=False, default=0) # 0-requested, 1-accepted, 2-completed
     rating = db.Column(db.Integer(), nullable=False) # Mandatory to give ratings for closing the job
     remarks = db.Column(db.String(500))
     # Relations
+    professional = db.relationship("Professional", backref="service_requests", lazy=True)
+
+    # Finds professional assigned to the job
+    def get_professional(self):
+        professional = self.professional
+        if professional:
+            return professional.name
+        else:
+            return "Unassigned"
+        
+    # Status decoder
+    def get_status(self):
+        status = self.status
+        if status == 0:
+            return "Requested"
+        elif status == 1:
+            return "Accepted"
+        else:
+            return "Completed"
+            

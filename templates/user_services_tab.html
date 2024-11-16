@@ -1,0 +1,33 @@
+{% extends "user_dashboard.html" %}
+{% block subcontent %}
+    <!-- Table of all the active services that are avaliable-->
+    <table class="table mt-2">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Service Name</th>
+            <th scope="col">Description</th>
+            <th scope="col">Price</th>
+            <th scope="col">Time Required</th>
+            <th scope="col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for service in services %}
+                <tr>
+                    <th scope="row">{{service.id}}</th>
+                    <td>{{service.capitalised_name()}}</td>
+                    <td style="max-width: 600px;">{{service.desc}}</td>
+                    <td>&#8377;{{service.price}}</td>
+                    <td>{{service.time_required}} Hrs.</td>
+                    <td>
+                        <form action="/user/services/create_request/{{service.id}}" method="POST">
+                            <button type="submit" class="btn btn-outline-primary">Book</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- Adds a new service -->
+{% endblock %}

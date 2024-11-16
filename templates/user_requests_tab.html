@@ -1,0 +1,39 @@
+{% extends "user_dashboard.html" %}
+{% block subcontent %}
+    <!-- Table of all the active services that are avaliable-->
+    <table class="table mt-2">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Service Name</th>
+            <th scope="col">Professional Name</th>
+            <th scope="col">Start Date</th>
+            <th scope="col">End Date</th>
+            <th scope="col">Status</th>
+            <th scope="col">Rating</th>
+            <th scope="col">Remark</th>
+            <th scope="col">Action</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for service_request in service_requests %}
+                <tr>
+                    <th scope="row">{{service_request.id}}</th>
+                    <td>{{service_request.services.name}}</td>
+                    <td>{{service_request.get_professional()}}</td>
+                    <td>{{service_request.start_date}}</td>
+                    <td>{{service_request.end_date}}</td>
+                    <td>{{service_request.get_status()}}</td>
+                    <td>{{service_request.rating}}</td>
+                    <td>{{service_request.remarks}}</td>
+                    <td>
+                        <form action="#" method="POST">
+                            <button type="submit" class="btn btn-outline-danger">Cancel</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- Adds a new service -->
+{% endblock %}

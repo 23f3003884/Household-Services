@@ -23,7 +23,7 @@ def login_page():
                 if usr.role == 0:
                     return redirect(url_for("admin_page"))
                 elif usr.role == 1:
-                    return redirect(url_for("user_page"))
+                    return redirect(url_for("user_page", button_state=1))
                 else:
                     return redirect(url_for("professional_page"))
             else:
@@ -119,9 +119,47 @@ def status_changer(user_id):
 
 
 # User dashboard
-@app.route("/user")
-def user_page():
-    return render_template("user_dashboard.html")
+@app.route("/user/<int:button_state>", methods=["GET", "POST"])
+def user_page(button_state): # button_state: 0:user_requests_tab, 1:user_services_tab
+    if button_state:
+        return redirect(url_for("user_services_tab", button_state=button_state))
+    else:
+        return redirect(url_for("user_requests_tab", button_state=button_state))
+
+# User services tab
+@app.route("/user/services", methods=["GET", "POST"])
+def user_services_tab():
+    button_state = request.args.get("button_state", 1, type=int) # Accessing data send using url_for function, default=1
+    services = Service.query.filter_by(status=1)
+    return render_template("user_services_tab.html", services=services, button_state=button_state)
+
+# User create service request
+@app.route("/user/services/create_request/<int:service_id>", methods=["GET", "POST"])
+def create_request(service_id):
+    customer_id = current_user.id
+    service_request = ServiceRequest(service_id=service_id, customer_id=customer_id)
+    try:
+        db.session.add(service_request)
+        db.session.commit()
+        flash("Service requested successfuly.", category="info")
+
+        return redirect(url_for("user_services_tab"))
+    except Exception as e:
+        print(e)
+        db.session.rollback()
+
+        flash("Service request failed.", category="danger")
+
+    return redirect(url_for("user_services_tab"))
+
+
+
+# User requests tab
+@app.route("/user/requests", methods=["GET", "POST"])
+def user_requests_tab():
+    button_state = request.args.get("button_state", 0, type=int) # Accessing data send using url_for function, default=0
+    service_requests = ServiceRequest.query.all()
+    return render_template("user_requests_tab.html", service_requests=service_requests, button_state=button_state)
 
 # Professional dashboard
 @app.route("/professional")
@@ -155,6 +193,7 @@ def customer_registration_page():
             new_user = User(email=email, password=password, name=name, address=address, pincode=pincode)
             db.session.add(new_user)
             db.session.commit()
+            flash("Account created successfuly.", category="info" )
 
             return redirect(url_for("login_page"))
         except:
