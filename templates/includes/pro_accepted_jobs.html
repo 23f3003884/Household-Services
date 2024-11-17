@@ -1,0 +1,37 @@
+<!-- Accepted Jobs-->
+<h4 style="margin-bottom: -10px;" class="h4 text-start mt-3">Accepted Jobs</h4>
+<hr style="margin-bottom:  0;" class="divider">
+{% if accepted_service_requests %}
+    <table class="table mt-1">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Customer Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Request Date and Time</th>
+            <th scope="col">Address</th>
+            <th scope="col">Pin Code</th>
+            <th scope="col">Action</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for accepted_service_request in accepted_service_requests %}
+                <tr>
+                    <th scope="row">{{accepted_service_request.id}}</th>
+                    <td>{{accepted_service_request.customer.name}}</td>
+                    <td>{{accepted_service_request.customer.email}}</td>
+                    <td>{{accepted_service_request.start_date}}</td>
+                    <td>{{accepted_service_request.customer.address}}</td>
+                    <td>{{accepted_service_request.customer.pincode}}</td>
+                    <td>
+                        <form action="{{ url_for('accept_request', request_id=accepted_service_request.id)}}" method="POST">
+                            <button type="submit" class="btn btn-outline-success">Completed</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="h5 mt-3">No data avaliable.</div>
+{% endif %}

@@ -1,0 +1,37 @@
+<!-- Avaliable Jobs-->
+<h4 style="margin-bottom: -10px;" class="h4 text-start mt-3">Avaliable {{current_user.professional_info.service.name}} Jobs</h4>
+<hr style="margin-bottom:  -10px;" class="divider">
+{% if requested_service_requests %}
+    <table class="table mt-1">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Customer Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Request Date and Time</th>
+            <th scope="col">Address</th>
+            <th scope="col">Pin Code</th>
+            <th scope="col">Action</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for requested_service_request in requested_service_requests %}
+                <tr>
+                    <th scope="row">{{requested_service_request.id}}</th>
+                    <td>{{requested_service_request.customer.name}}</td>
+                    <td>{{requested_service_request.customer.email}}</td>
+                    <td>{{requested_service_request.start_date}}</td>
+                    <td>{{requested_service_request.customer.address}}</td>
+                    <td>{{requested_service_request.customer.pincode}}</td>
+                    <td>
+                        <form action="{{ url_for('accept_request', request_id=requested_service_request.id)}}" method="POST">
+                            <button type="submit" class="btn btn-outline-primary">Accept</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="h5 mt-3">Currently there are no jobs.</div>
+{% endif %}

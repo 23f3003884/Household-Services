@@ -1,0 +1,33 @@
+<!-- Requested Services -->
+<h4 style="margin-bottom: -10px;" class="h4 text-start mt-3">Requested Services</h4>
+<hr style="margin-bottom:  0;" class="divider">
+{% if service_requests %}
+    <table class="table mt-1">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Service Name</th>
+            <th scope="col">Description</th>
+            <th scope="col">Start Date and Time</th>
+            <th scope="col">Action</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for service_request in service_requests %}
+                <tr>
+                    <th scope="row">{{service_request.id}}</th>
+                    <td>{{service_request.services.name}}</td>
+                    <td>{{service_request.services.desc}}</td>
+                    <td>{{service_request.start_date}}</td>
+                    <td>
+                        <form action="{{ url_for('cancel_request', request_id=service_request.id)}}" method="POST">
+                            <button type="submit" class="btn btn-outline-danger">Cancel</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="h5 mt-3">No requests to show.</div>
+{% endif %}

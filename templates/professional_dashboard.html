@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-    User Dashboard
+    Professional Dashboard
 {% endblock %}
 
 {% block content %}
@@ -9,19 +9,6 @@
         <!-- main-window-header -->
         <div class="row">
             <div class="input-group">
-                    <!-- Sevices & Requests Tabs-->
-                    <ul class="nav nav-pills" >
-                        <li class="nav-item">
-                            <form action="{{ url_for('user_page', button_state=1) }}" method="POST">
-                                <button style="border-radius: 0;" class="nav-link {{'active' if button_state}}" type="submit">Services</button>
-                            </form>
-                        </li>
-                        <li class="nav-item">
-                            <form action="{{ url_for('user_page', button_state=0) }}" method="POST">
-                                <button style="border-radius: 0;" class="nav-link {{'active' if button_state==0}}" type="submit">Requests</button>
-                            </form>
-                        </li>
-                    </ul>
                     <!-- Search box -->
                     <input style="width: 400px;" type="text" class="form-control ms-1" placeholder="Search">
                     <!-- Search filter dropdowns-->
@@ -37,9 +24,20 @@
                     </button>
             </div>
         </div>
-        <!-- content: Services Tab or Requests Tab -->
-        {% block subcontent %}
-        {% endblock %}
+        <!-- content -->
+
+        <!-- Avaliable Jobs -->
+         {% include "includes/pro_avaliable_jobs.html" %}
+
+
+        <!-- Accepted Jobs -->
+         {% include "includes/pro_accepted_jobs.html" %}
+
+        
+        <!-- Completed Jobs -->
+         {% include "includes/pro_completed_jobs.html" %}
+
+
         
     </div>
     <div style="height: 1000px;"></div>

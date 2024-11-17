@@ -157,9 +157,10 @@ def create_request(service_id):
 # User requests tab
 @app.route("/user/requests", methods=["GET", "POST"])
 def user_requests_tab():
-    button_state = request.args.get("button_state", 0, type=int) # Accessing data send using url_for function, default=0
-    service_requests = ServiceRequest.query.all()
-    return render_template("user_requests_tab.html", service_requests=service_requests, button_state=button_state)
+    button_state = request.args.get("button_state", 0, type=int) # Accessing data, sent to us, using url_for function, default=0
+    service_requests = ServiceRequest.query.filter(ServiceRequest.customer_id==current_user.id, ServiceRequest.status==0)
+    approved_service_requests = ServiceRequest.query.filter(ServiceRequest.customer_id==current_user.id, ServiceRequest.status==1)
+    return render_template("user_requests_tab.html", service_requests=service_requests, button_state=button_state, approved_service_requests=approved_service_requests)
 
 # User cancel request
 @app.route("/cancel_request/<int:request_id>", methods=["GET", "POST"])
@@ -179,11 +180,31 @@ def cancel_request(request_id):
 
 
 
-
 # Professional dashboard
-@app.route("/professional")
-def professional_page():
-    return render_template("professional_dashboard.html")
+@app.route("/professional", methods=["GET", "POST"])
+def professional_page(): 
+    service_type_id = current_user.professional_info.service_type # Accessing current user's service type(id)
+    requested_service_requests = ServiceRequest.query.filter(ServiceRequest.service_id==service_type_id, ServiceRequest.status==0).all()
+    accepted_service_requests = ServiceRequest.query.filter(ServiceRequest.professional_id==current_user.professional_info.id, ServiceRequest.status==1).all() 
+    completed_service_requests = ServiceRequest.query.filter(ServiceRequest.professional_id==current_user.professional_info.id, ServiceRequest.status==2).all() 
+
+    return render_template("professional_dashboard.html", requested_service_requests=requested_service_requests, accepted_service_requests=accepted_service_requests, completed_service_requests=completed_service_requests)
+
+# Accept request
+@app.route("/accept_request/<int:request_id>", methods=["GET", "POST"])
+def accept_request(request_id):
+    service_request = ServiceRequest.query.get(request_id)
+    service_request.professional_id = current_user.professional_info.id # Assigning the current professional to the job
+    service_request.status = 1 # changing the status to accepted
+    try:
+        db.session.commit()
+        flash("Job accepted successfuly.", category="info")
+        return redirect(url_for("professional_page"))
+    except:
+        db.session.rollback()
+        flash("Something went wrong! Job not assigned.", category="danger")
+
+    return redirect(url_for("professional_page"))
 
 
 # Customer registration

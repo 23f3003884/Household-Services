@@ -32,6 +32,7 @@ class Professional(db.Model):
     # Relations
     service = db.relationship("Service", backref="professionals", lazy=True)
 
+    # Ready for work -pending
 
 class Service(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
@@ -65,9 +66,14 @@ class ServiceRequest(db.Model):
     def get_professional(self):
         professional = self.professional
         if professional:
-            return professional.name
+            return professional.user.name
         else:
             return "Unassigned"
+        
+    # Finds customer name 
+    def get_customer(self):
+        return self.customer.name
+        
         
     # Status decoder
     def get_status(self):
