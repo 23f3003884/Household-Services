@@ -122,9 +122,9 @@ def status_changer(user_id):
 @app.route("/user/<int:button_state>", methods=["GET", "POST"])
 def user_page(button_state): # button_state: 0:user_requests_tab, 1:user_services_tab
     if button_state:
-        return redirect(url_for("user_services_tab", button_state=button_state))
+        return redirect(url_for("user_services_tab"))
     else:
-        return redirect(url_for("user_requests_tab", button_state=button_state))
+        return redirect(url_for("user_requests_tab"))
 
 # User services tab
 @app.route("/user/services", methods=["GET", "POST"])
@@ -160,6 +160,25 @@ def user_requests_tab():
     button_state = request.args.get("button_state", 0, type=int) # Accessing data send using url_for function, default=0
     service_requests = ServiceRequest.query.all()
     return render_template("user_requests_tab.html", service_requests=service_requests, button_state=button_state)
+
+# User cancel request
+@app.route("/cancel_request/<int:request_id>", methods=["GET", "POST"])
+def cancel_request(request_id):
+    service_request = ServiceRequest.query.get(request_id)
+    try: 
+        db.session.delete(service_request)
+        db.session.commit()
+        flash("Service request deleted successfuly.", category="info")
+
+        return redirect(url_for("user_requests_tab"))
+    except:
+        db.session.rollback()
+        flash("Service request not deleted", category="danger")
+    
+    return redirect(url_for("user_requests_tab"))
+
+
+
 
 # Professional dashboard
 @app.route("/professional")

@@ -27,7 +27,7 @@
                     <td>{{service_request.rating}}</td>
                     <td>{{service_request.remarks}}</td>
                     <td>
-                        <form action="#" method="POST">
+                        <form action="{{ url_for('cancel_request', request_id=service_request.id)}}" method="POST">
                             <button type="submit" class="btn btn-outline-danger">Cancel</button>
                         </form>
                     </td>
