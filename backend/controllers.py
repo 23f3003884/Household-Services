@@ -2,6 +2,7 @@ from flask import render_template, url_for, redirect, request, flash
 from flask_login import login_user, logout_user, current_user, login_required
 from flask import current_app as app
 from backend.modals import *
+from sqlalchemy import or_
 
 # Home page
 @app.route("/")
@@ -158,9 +159,11 @@ def create_request(service_id):
 @app.route("/user/requests", methods=["GET", "POST"])
 def user_requests_tab():
     button_state = request.args.get("button_state", 0, type=int) # Accessing data, sent to us, using url_for function, default=0
-    service_requests = ServiceRequest.query.filter(ServiceRequest.customer_id==current_user.id, ServiceRequest.status==0)
-    approved_service_requests = ServiceRequest.query.filter(ServiceRequest.customer_id==current_user.id, ServiceRequest.status==1)
-    return render_template("user_requests_tab.html", service_requests=service_requests, button_state=button_state, approved_service_requests=approved_service_requests)
+    service_requests = ServiceRequest.query.filter(ServiceRequest.customer_id==current_user.id, ServiceRequest.status==0).all()
+    approved_service_requests = ServiceRequest.query.filter(ServiceRequest.customer_id==current_user.id, ServiceRequest.status==1).all()
+    completed_service_requests = ServiceRequest.query.filter(ServiceRequest.customer_id==current_user.id, ServiceRequest.status==2).all()
+
+    return render_template("user_requests_tab.html", service_requests=service_requests, button_state=button_state, approved_service_requests=approved_service_requests, completed_service_requests=completed_service_requests)
 
 # User cancel request
 @app.route("/cancel_request/<int:request_id>", methods=["GET", "POST"])
@@ -178,6 +181,31 @@ def cancel_request(request_id):
     
     return redirect(url_for("user_requests_tab"))
 
+# User feedback page
+@app.route("/user/service_feedback/<int:service_id>", methods=["GET", "POST"])
+def user_feedback_page(service_id):
+    service_request = ServiceRequest.query.get(service_id)
+
+    if request.method == "POST":
+        remarks = request.form.get("remarks")
+        rating = request.form.get("rating")
+        
+        try:
+            service_request.set_endtime()
+            service_request.status = 2
+            service_request.rating = rating
+            service_request.remarks = remarks
+            db.session.commit()
+            flash("Thankyou for your response.", category="info")
+
+            return redirect(url_for("user_requests_tab"))
+        except:
+            db.session.rollback()
+            flash("Something went wrong.", category="danger")
+    
+    return render_template("user_service_feedback.html", service_request=service_request)
+
+
 
 
 # Professional dashboard
@@ -185,8 +213,8 @@ def cancel_request(request_id):
 def professional_page(): 
     service_type_id = current_user.professional_info.service_type # Accessing current user's service type(id)
     requested_service_requests = ServiceRequest.query.filter(ServiceRequest.service_id==service_type_id, ServiceRequest.status==0).all()
-    accepted_service_requests = ServiceRequest.query.filter(ServiceRequest.professional_id==current_user.professional_info.id, ServiceRequest.status==1).all() 
-    completed_service_requests = ServiceRequest.query.filter(ServiceRequest.professional_id==current_user.professional_info.id, ServiceRequest.status==2).all() 
+    accepted_service_requests = ServiceRequest.query.filter(ServiceRequest.professional_id==current_user.professional_info.id, or_(ServiceRequest.status==1, ServiceRequest.status==2)).all() 
+    completed_service_requests = ServiceRequest.query.filter(ServiceRequest.professional_id==current_user.professional_info.id, ServiceRequest.status==3).all() 
 
     return render_template("professional_dashboard.html", requested_service_requests=requested_service_requests, accepted_service_requests=accepted_service_requests, completed_service_requests=completed_service_requests)
 

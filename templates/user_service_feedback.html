@@ -1,0 +1,32 @@
+{% extends "user_dashboard.html" %}
+{% block subcontent %}
+<h1 class="text-center mt-2">Feedback</h1>
+<div class="d-flex flex-column  align-items-center mt-3">
+    <form action="{{url_for('user_feedback_page', service_id=service_request.id)}}" method="POST">
+        <!-- Service Info-->
+        <div class="input-group mb-2">
+            <span class="input-group-text width-140" >Service Name</span>
+            <input type="text" class="form-control" value="{{service_request.services.name}}" readonly>
+        </div>
+        <div class="input-group mb-2">
+            <span class="input-group-text width-140" >Professional Name</span>
+            <input type="text" class="form-control" value="{{service_request.professional.user.name}}">
+        </div>
+        <div class="input-group mb-2">
+            <span class="input-group-text width-140" >Price</span>
+            <input type="text" class="form-control" value="{{service_request.services.price}}">
+        </div>
+        <div class="input-group mb-2">
+            <span class="input-group-text width-140" >Rating</span>
+            <input type="number" class="form-control" name="rating" placeholder="Choose from 0-5" min="0", max="5", required>
+        </div>
+        <div class="input-group">
+            <span class="input-group-text width-140">Remarks</span>
+            <textarea name="remarks" class="form-control"></textarea>
+        </div>
+          
+        <!-- Submit Button-->
+        <button type="submit" class="btn btn-primary mt-1">Submit</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
 from flask_login import UserMixin
+from datetime import datetime
 
 
 db = SQLAlchemy()
@@ -15,6 +16,7 @@ class User(db.Model, UserMixin):
     pincode = db.Column(db.Integer(), nullable=False)
     status = db.Column(db.Integer(), nullable=False, default=1) # 0-inactive, 1-active
 
+    
     # Relations
     service_requests = db.relationship("ServiceRequest", cascade="all, delete", backref="customer", lazy=True) # For accessing all the service requests created by a user(customer)
     professional_info = db.relationship("Professional", cascade="all, delete", backref="user", uselist=False) # one to one relation for accessing futher professional info 
@@ -54,9 +56,9 @@ class ServiceRequest(db.Model):
     service_id = db.Column(db.Integer(), db.ForeignKey("service.id"), nullable=False) # Foreign Key - Service table
     customer_id = db.Column(db.Integer(), db.ForeignKey("user.id"), nullable=False) #Foreign key - from User(Customer) table
     professional_id = db.Column(db.Integer(), db.ForeignKey("professional.id"), nullable=True) # Foreign Key - Professional table, One professional for one job
-    start_date = db.Column(db.DateTime(), nullable=False, default=func.now()) # func.now():get current time
+    start_date = db.Column(db.DateTime(), nullable=False, default=datetime.utcnow()) # func.now():get current time
     end_date = db.Column(db.DateTime(), nullable=False)
-    status = db.Column(db.Integer(), nullable=False, default=0) # 0-requested, 1-accepted, 2-completed
+    status = db.Column(db.Integer(), nullable=False, default=0) # 0-requested, 1-accepted, 2-completed at users-end, 3-completed at professionals-end
     rating = db.Column(db.Integer(), nullable=False) # Mandatory to give ratings for closing the job
     remarks = db.Column(db.String(500))
     # Relations
@@ -84,4 +86,8 @@ class ServiceRequest(db.Model):
             return "Accepted"
         else:
             return "Completed"
+        
+    # Service complition time setter
+    def set_endtime(self):
+        self.end_date = datetime.utcnow()
             

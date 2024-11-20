@@ -22,9 +22,7 @@
                     <td>{{approved_service_request.professional.user.email}}</td>
                     <td>{{approved_service_request.start_date}}</td>
                     <td>
-                        <form action="{{ url_for('accept_request', request_id=approved_service_request.id)}}" method="POST">
-                            <button type="submit" class="btn btn-outline-success">Done</button>
-                        </form>
+                        <a href="{{ url_for('user_feedback_page', service_id=approved_service_request.id)}}"><button type="submit" class="btn btn-outline-success">Feedback</button></a>
                     </td>
                 </tr>
             {% endfor %}
