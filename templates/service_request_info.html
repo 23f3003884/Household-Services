@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="text-center mt-2">Service Request Details</h1>
+<div class="container">
+    <!-- Service details -->
+    <div class="row">
+        <div class="col input-group mb-2">
+            <span class="input-group-text width-140" >Service Name</span>
+            <input type="text" class="form-control" value="{{service_request.services.name}}" readonly>
+        </div>
+        <div class="col input-group mb-2">
+            <span class="input-group-text width-140" >Price</span>
+            <input type="text" class="form-control" value="{{service_request.services.price}}" readonly>
+        </div>
+        <div class="col- input-group mb-2">
+            <span class="input-group-text width-140">Description</span>
+            <textarea type="text" class="form-control" readonly>{{service_request.services.desc}}</textarea>
+        </div>        
+    </div>
+    <!-- Professioanl details -->
+    <div class="row">
+        <div class="col input-group mb-2">
+            <span class="input-group-text width-140" >Professional Name</span>
+            <input type="text" class="form-control" value="{{service_request.professional.user.name}}" readonly>
+        </div>
+        <div class="col input-group mb-2">
+            <span class="input-group-text width-140" >Email</span>
+            <input type="text" class="form-control" value="{{service_request.professional.user.email}}" readonly>
+        </div>
+    </div>
+    <!-- Customer details-->
+     <div class="row">
+        <div class="col input-group mb-2">
+            <span class="input-group-text width-140" >Customer Name</span>
+            <input type="text" class="form-control" value="{{service_request.customer.name}}" readonly>
+        </div>
+        <div class="col input-group mb-2">
+            <span class="input-group-text width-140" >Email</span>
+            <input type="text" class="form-control" value="{{service_request.customer.email}}" readonly>
+        </div>
+     </div>
+     <!-- Start and end datetime-->
+     <div class="row">
+        <div class="col input-group mb-2">
+            <span class="input-group-text width-140" >Start Date&Time</span>
+            <input type="text" class="form-control" value="{{service_request.start_date}}" readonly>
+        </div>
+        <div class="col input-group mb-2">
+            <span class="input-group-text width-140" >End Date&Time</span>
+            <input type="text" class="form-control" value="{{service_request.end_date}}" readonly>
+        </div>
+     </div>
+     <!-- Status, rating and remarks -->
+    <div class="row">
+        <div class="col input-group mb-2">
+            <span class="input-group-text width-140" >Status</span>
+            <input type="text" class="form-control" value="{{service_request.get_status()}}" readonly>
+        </div>
+        <div class="col input-group mb-2">
+            <span class="input-group-text width-140" >Rating</span>
+            <input type="text" class="form-control" value="{{service_request.rating}}" readonly>
+        </div>
+        <div class="col- input-group">
+            <span class="input-group-text width-140">Remarks</span>
+            <textarea name="remarks" class="form-control" readonly>{{service_request.remarks}}</textarea>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

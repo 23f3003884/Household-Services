@@ -24,10 +24,10 @@
                     <td>{{accepted_service_request.customer.address}}</td>
                     <td>{{accepted_service_request.customer.pincode}}</td>
                     <td>
-                        <form action="{{ url_for('accept_request', request_id=accepted_service_request.id)}}" method="POST">
+                        <form action="{{ url_for('service_completed', service_request_id=accepted_service_request.id)}}" method="POST">
                             <div class="input-group">
                                 <input style="width: 71px;" type="number" class="form-control" name="rating" placeholder="Rate Customer" min="0", max="5", required>
-                                <button type="submit" class="btn btn-outline-success" {{ "disabled" if accepted_service_request.status==1  }} >Completed</button>
+                                <button type="submit" class="btn btn-outline-success" {{ "disabled" if accepted_service_request.status==1  }} >Completed</button> <!-- Disabled till customer don't give feedback-->
                             </div>
                         </form>
                     </td>

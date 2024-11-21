@@ -8,26 +8,27 @@
             <th scope="col">#</th>
             <th scope="col">Customer Name</th>
             <th scope="col">Email</th>
-            <th scope="col">Request Date and Time</th>
+            <th scope="col">Rating</th>            
+            <th scope="col">Completion Date and Time</th>
             <th scope="col">Address</th>
             <th scope="col">Pin Code</th>
-            <th scope="col">Action</th>
         </tr>
         </thead>
         <tbody>
             {% for completed_service_request in completed_service_requests %}
                 <tr>
-                    <th scope="row">{{completed_service_request.id}}</th>
+                    <th scope="row">
+                        <a href="{{ url_for('service_request_info', id=completed_service_request.id)}}">
+                            {{completed_service_request.id}}
+                        </a>
+                    </th>
                     <td>{{completed_service_request.customer.name}}</td>
                     <td>{{completed_service_request.customer.email}}</td>
-                    <td>{{completed_service_request.start_date}}</td>
+                    <td>{{completed_service_request.customer.rating}}</td>
+                    <td>{{completed_service_request.end_date}}</td>
                     <td>{{completed_service_request.customer.address}}</td>
                     <td>{{completed_service_request.customer.pincode}}</td>
-                    <td>
-                        <form action="{{ url_for('accept_request', request_id=completed_service_request.id)}}" method="POST">
-                            <button type="submit" class="btn btn-outline-primary">Accept</button>
-                        </form>
-                    </td>
+                    
                 </tr>
             {% endfor %}
         </tbody>

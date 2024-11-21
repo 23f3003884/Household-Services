@@ -16,7 +16,11 @@
         <tbody>
             {% for completed_service_request in completed_service_requests %}
                 <tr>
-                    <th scope="row">{{completed_service_request.id}}</th>
+                    <th scope="row">
+                        <a href="{{ url_for('service_request_info', id=completed_service_request.id)}}">
+                            {{completed_service_request.id}}
+                        </a>
+                    </th>
                     <td>{{completed_service_request.services.name}}</td>
                     <td>{{completed_service_request.professional.user.name}}</td>
                     <td>{{completed_service_request.end_date}}</td>

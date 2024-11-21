@@ -161,7 +161,7 @@ def user_requests_tab():
     button_state = request.args.get("button_state", 0, type=int) # Accessing data, sent to us, using url_for function, default=0
     service_requests = ServiceRequest.query.filter(ServiceRequest.customer_id==current_user.id, ServiceRequest.status==0).all()
     approved_service_requests = ServiceRequest.query.filter(ServiceRequest.customer_id==current_user.id, ServiceRequest.status==1).all()
-    completed_service_requests = ServiceRequest.query.filter(ServiceRequest.customer_id==current_user.id, ServiceRequest.status==2).all()
+    completed_service_requests = ServiceRequest.query.filter(ServiceRequest.customer_id==current_user.id, or_(ServiceRequest.status==2, ServiceRequest.status==3)).all()
 
     return render_template("user_requests_tab.html", service_requests=service_requests, button_state=button_state, approved_service_requests=approved_service_requests, completed_service_requests=completed_service_requests)
 
@@ -205,6 +205,13 @@ def user_feedback_page(service_id):
     
     return render_template("user_service_feedback.html", service_request=service_request)
 
+# Service request full info page
+@app.route("/service_request_info/<int:id>")
+def service_request_info(id):
+    print(type(id))
+    service_request = ServiceRequest.query.get(id)
+    return render_template("service_request_info.html", service_request=service_request)
+
 
 
 
@@ -233,6 +240,24 @@ def accept_request(request_id):
         flash("Something went wrong! Job not assigned.", category="danger")
 
     return redirect(url_for("professional_page"))
+
+# Service request Completion 
+@app.route("/service_completed/<int:service_request_id>", methods=["GET", "POST"])
+def service_completed(service_request_id):
+    service_request = ServiceRequest.query.get(service_request_id)
+    customer = User.query.get(service_request.customer_id)
+    if request.method == "POST":
+        rating = int(request.form.get("rating"))
+        try:
+            customer.update_rating(rating)
+            service_request.status = 3
+            db.session.commit()
+            flash("Service done successfuly.", category="info")
+        except:
+            db.session.rollback()
+            flash("Something went wrong.", category="danger")
+    return redirect(url_for("professional_page"))
+
 
 
 # Customer registration

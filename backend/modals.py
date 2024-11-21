@@ -15,8 +15,8 @@ class User(db.Model, UserMixin):
     address = db.Column(db.String(100), nullable=False)
     pincode = db.Column(db.Integer(), nullable=False)
     status = db.Column(db.Integer(), nullable=False, default=1) # 0-inactive, 1-active
-
-    
+    rating = db.Column(db.Integer(), default=0)
+        
     # Relations
     service_requests = db.relationship("ServiceRequest", cascade="all, delete", backref="customer", lazy=True) # For accessing all the service requests created by a user(customer)
     professional_info = db.relationship("Professional", cascade="all, delete", backref="user", uselist=False) # one to one relation for accessing futher professional info 
@@ -24,17 +24,30 @@ class User(db.Model, UserMixin):
     # Make every first leter of word capitalized
     def capitalised_name(self):
         return self.name.title()
+    
+    # Update rating
+    def update_rating(self, rating):
+        if not self.rating:
+            self.rating = 0
+        self.rating = int((self.rating + rating)/2)
+
 
 class Professional(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     user_id = db.Column(db.Integer(), db.ForeignKey("user.id"),unique=True, nullable=False) #Foreign key - from User table
     service_type = db.Column(db.Integer(), db.ForeignKey("service.id"), nullable=False) #Foreign Key - from Service table
     experience = db.Column(db.Integer(), nullable=False)
-    rating = db.Column(db.Integer(), nullable=False)
+    
     # Relations
     service = db.relationship("Service", backref="professionals", lazy=True)
 
-    # Ready for work -pending
+    # Ready for work 
+    def ready_for_work(self):
+        service_request = ServiceRequest.query.filter(ServiceRequest.professional.id == self.id, ServiceRequest.status==1)
+        if service_request:
+            return False
+        return True
+
 
 class Service(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
@@ -55,11 +68,11 @@ class ServiceRequest(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     service_id = db.Column(db.Integer(), db.ForeignKey("service.id"), nullable=False) # Foreign Key - Service table
     customer_id = db.Column(db.Integer(), db.ForeignKey("user.id"), nullable=False) #Foreign key - from User(Customer) table
-    professional_id = db.Column(db.Integer(), db.ForeignKey("professional.id"), nullable=True) # Foreign Key - Professional table, One professional for one job
-    start_date = db.Column(db.DateTime(), nullable=False, default=datetime.utcnow()) # func.now():get current time
-    end_date = db.Column(db.DateTime(), nullable=False)
+    professional_id = db.Column(db.Integer(), db.ForeignKey("professional.id")) # Foreign Key - Professional table, One professional for one job
+    start_date = db.Column(db.DateTime(), nullable=False, default=datetime.now().replace(microsecond=0)) # datetime.now():get current time
+    end_date = db.Column(db.DateTime())
     status = db.Column(db.Integer(), nullable=False, default=0) # 0-requested, 1-accepted, 2-completed at users-end, 3-completed at professionals-end
-    rating = db.Column(db.Integer(), nullable=False) # Mandatory to give ratings for closing the job
+    rating = db.Column(db.Integer()) # Mandatory to give ratings for closing the job
     remarks = db.Column(db.String(500))
     # Relations
     professional = db.relationship("Professional", backref="service_requests", lazy=True)
@@ -89,5 +102,5 @@ class ServiceRequest(db.Model):
         
     # Service complition time setter
     def set_endtime(self):
-        self.end_date = datetime.utcnow()
+        self.end_date = datetime.now().replace(microsecond=0)
             
