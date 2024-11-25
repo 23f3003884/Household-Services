@@ -1,0 +1,42 @@
+
+{% extends "admin_dashboard.html" %}
+{% block subcontent %}
+<!-- Avaliable Jobs-->
+<h4 style="margin-bottom: -10px;" class="h4 text-start mt-3">Service Requests</h4>
+<hr style="margin-bottom:  -10px;" class="divider">
+{% if requests %}
+    <table class="table mt-1">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Customer Name</th>
+            <th scope="col">Professioanl Name</th>
+            <th scope="col">Request Date and Time</th>
+            <th scope="col">Address</th>
+            <th scope="col">Pin Code</th>
+            <th scope="col">Status</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for request in requests %}
+                <tr>
+                    <th scope="row">
+                        <a href="{{ url_for('service_request_info', id=request.id)}}">
+                            {{request.id}}
+                        </a>
+                    </th>
+                    <td>{{request.customer.name}}</td>
+                    <td>{{request.get_professional()}}</td>
+                    <td>{{request.start_date}}</td>
+                    <td>{{request.customer.address}}</td>
+                    <td>{{request.customer.pincode}}</td>
+                    <td>{{request.get_status()}}</td>
+                    
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="h5 mt-3">Currently there are no jobs.</div>
+{% endif %}
+{% endblock %}

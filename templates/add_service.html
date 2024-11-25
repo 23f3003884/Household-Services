@@ -11,25 +11,25 @@
             <!-- Service Info-->
             <div class="input-group mb-3">
                 <span class="input-group-text width-140" >Service Name</span>
-                <input type="text" class="form-control" name="name">
+                <input type="text" class="form-control" name="name" required>
             </div>
             <div class="input-group mb-3">
                 <span class="input-group-text width-140" >Description</span>
-                <input type="text" class="form-control" name="desc">
+                <input type="text" class="form-control" name="desc" required>
             </div>
             <div class="input-group mb-3">
                 <span class="input-group-text width-140" >Price</span>
-                <input type="text" class="form-control" name="price">
+                <input type="text" class="form-control" name="price" required>
             </div>
             <div class="input-group mb-3">
                 <span class="input-group-text width-140" >Time Required</span>
-                <input type="text" class="form-control" name="time_required">
+                <input type="text" class="form-control" name="time_required" required>
             </div>
             
             <!-- Add and Cancel Button-->
             <div class="text-end">
                 <button type="submit" class="btn btn-primary ">Add Service</button>
-                <a href="{{ url_for('admin_page') }}"><button type="button" class="btn btn-danger">Cancel</button></a>
+                <a href="{{ url_for('admin_page', button_state=0) }}"><button type="button" class="btn btn-danger">Cancel</button></a>
             </div>
         </form>
     </div>

@@ -1,0 +1,97 @@
+{% extends "admin_dashboard.html" %}
+{% block subcontent %}
+<!-- Professionals Requests -->
+<h4 style="margin-bottom: -10px;" class="h4 text-start mt-3">Professional Requests</h4>
+<hr style="margin-bottom:  0;" class="divider">
+<table class="table mt-1">
+    <thead>
+       <tr>
+        <th scope="col">#</th>
+        <th scope="col">Professional Name</th>
+        <th scope="col">Email</th>
+        <th scope="col">Service Type</th>
+        <th scope="col">Experience</th>
+        <th scope="col">Address</th>
+        <th scope="col">Pin Code</th>
+        <th scope="col">Active</th>
+      </tr>
+    </thead>
+    <tbody>
+        <!-- Here profesional is an object of User modal-->
+        {% for user in users %}
+            <tr>
+                {% if user.professional_info and user.status==0%}
+                    <th scope="row">{{user.id}}</th>
+                    <td>{{user.capitalised_name()}}</td>
+                    <td>{{user.email}}</td>
+                    <td>{{user.professional_info.service.name}}</td>
+                    <td>{{user.professional_info.experience}} years</td>
+                    <td>{{user.address}}</td>
+                    <td>{{user.pincode}}</td>
+                
+                <td>
+                    <form action="{{ url_for('status_changer', user_id=user.id)}}", method="POST">
+                        {% if user.status %}
+                            <button type="submit" class="btn btn-primary">Active</button>
+                        {% else %}
+                            <button type="submit" class="btn btn-danger">Inactive</button>
+                        {% endif %}
+                    </form>
+                </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<!-- All Users-->
+<h4 style="margin-bottom: -10px;" class="h4 text-start mt-3">All Users</h4>
+<hr style="margin-bottom:  0;" class="divider">
+<table class="table mt-1">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">Email</th>
+        <th scope="col">Address</th>
+        <th scope="col">Pin Code</th>
+        <th scope="col">Rating</th>
+        <th scope="col">Active</th>
+      </tr>
+      <!--
+       <tr>
+        <th scope="col">#</th>
+        <th scope="col">Professional Name</th>
+        <th scope="col">Email</th>
+        <th scope="col">Service Type</th>
+        <th scope="col">Experience</th>
+        <th scope="col">Address</th>
+        <th scope="col">Pin Code</th>
+        <th scope="col">Rating</th>
+        <th scope="col">Active</th>
+      </tr>
+      -->
+    </thead>
+    <tbody>
+        <!-- Here profesional is an object of User modal-->
+        {% for user in users %}
+            <tr>
+                <th scope="row">{{user.id}}</th>
+                <td>{{user.capitalised_name()}}</td>
+                <td>{{user.email}}</td>
+                <td>{{user.address}}</td>
+                <td>{{user.pincode}}</td>
+                <td>{{user.rating}}</td> <!-- Using relation professional_info described on User modal-->
+                <td>
+                    <form action="{{ url_for('status_changer', user_id=user.id)}}", method="POST">
+                        {% if user.status %}
+                            <button type="submit" class="btn btn-primary">Active</button>
+                        {% else %}
+                            <button type="submit" class="btn btn-danger">Inactive</button>
+                        {% endif %}
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

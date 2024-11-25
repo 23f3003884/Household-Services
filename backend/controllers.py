@@ -22,7 +22,7 @@ def login_page():
                 login_user(usr) # added user to app session
                 # Separating users based on their roles
                 if usr.role == 0:
-                    return redirect(url_for("admin_page"))
+                    return redirect(url_for("admin_page", button_state=0))
                 elif usr.role == 1:
                     return redirect(url_for("user_page", button_state=1))
                 else:
@@ -36,12 +36,40 @@ def login_page():
 
 
 # Admin dashboard
-@app.route("/admin")
+@app.route("/admin/<int:button_state>", methods=["GET", "POST"]) #Button state: 0-Services, 1-Users, 2-Requests
 @login_required
-def admin_page():
+def admin_page(button_state):
+    if button_state==0: # Services
+        return redirect(url_for("services_tab_page"))
+    elif button_state==1: # Users 
+        return redirect(url_for("users_tab_page"))
+    else: # Requests
+        return redirect(url_for("requests_tab_page"))
+
+# Services Tab page
+@app.route("/admin/services", methods=["GET", "POST"])
+def services_tab_page():
+    button_state = 0 # Sets default button_state
     services = Service.query.filter_by(status=1)
-    profesionals = User.query.filter_by(role=2)
-    return render_template("admin_dashboard.html", services=services, profesionals=profesionals)
+    
+    return render_template("services_tab.html", button_state=button_state, services=services)
+
+# Users Tab page
+@app.route("/admin/users", methods=["GET", "POST"])
+def users_tab_page():
+    button_state = 1
+    users = User.query.filter(or_(User.role==1, User.role==2))
+    return render_template("users_tab.html", button_state=button_state, users=users)
+
+
+# Requests Tab page
+@app.route("/admin/requests", methods=["GET", "POST"])
+def requests_tab_page():
+    button_state = 2
+    requests = ServiceRequest.query.all()
+    return render_template("requests_tab.html", button_state=button_state, requests=requests)
+
+
 
 # Adding a service 
 @app.route("/add_service", methods=["GET", "POST"])
@@ -57,7 +85,7 @@ def add_service():
             flash("Service added successfully.", category="info")
             db.session.commit()
         
-            return redirect(url_for("admin_page"))
+            return redirect(url_for("admin_page", button_state=0))
         except:
             db.session.rollback() # If something goes wrong above it will undo that
             flash("Something went wrong.", category="danger")
@@ -84,12 +112,12 @@ def edit_service(service_id):
                 flash("Service updated successfully.", category="info")
                 db.session.commit()
            
-            return redirect(url_for("admin_page"))
+            return redirect(url_for("admin_page", button_state=0))
         except:
             db.session.rollback() # If something goes wrong above it will undo that
             flash("Something went wrong.", category="danger")
     
-    return render_template("edit_service.html", service=service)
+    return render_template("edit_service.html", service=service, button_state=0)
 
 # Deleting(deactivating) a service
 @app.route("/delete_service/<service_id>")
@@ -99,10 +127,10 @@ def delete_service(service_id):
     db.session.commit()
     flash("Service deleted", category="danger")
 
-    return redirect(url_for("admin_page"))
+    return redirect(url_for("admin_page", button_state=0))
 
 # Toggle funtionality for blocking/unblocking of Users
-@app.route("/professional_status/<user_id>", methods=["GET", "POST"])
+@app.route("/user_status/<user_id>", methods=["GET", "POST"])
 def status_changer(user_id):
     if request.method == "POST":
         user = User.query.filter_by(id=user_id).first()
@@ -112,8 +140,7 @@ def status_changer(user_id):
             user.status = 1
         db.session.commit()
 
-        return redirect(url_for("admin_page"))
-    return redirect(url_for("admin_page"))
+    return redirect(url_for("admin_page", button_state=1))
 
 
 

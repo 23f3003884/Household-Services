@@ -31,6 +31,8 @@ class User(db.Model, UserMixin):
             self.rating = 0
         self.rating = int((self.rating + rating)/2)
 
+    # Pending: Funtion to update ratings of professionals 
+
 
 class Professional(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
