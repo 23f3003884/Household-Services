@@ -9,6 +9,7 @@ from sqlalchemy import or_
 def home_page():
     return render_template('index.html')
 
+#pending: restrict access to inactive users
 # Login page
 @app.route("/login", methods=["GET", "POST"])
 def login_page():
@@ -45,6 +46,58 @@ def admin_page(button_state):
         return redirect(url_for("users_tab_page"))
     else: # Requests
         return redirect(url_for("requests_tab_page"))
+    
+# Search funtionality
+@app.route("/admin/search", methods=["GET", "POST"])
+def admin_search():
+    button_state=request.args.get("button_state", type=int)
+    if request.method=="POST":
+        search_text = request.form.get("search_text")
+        if button_state==0:
+            services = Service.query.filter(Service.name.ilike(f"%{search_text}%")).all()
+            
+            return render_template("services_tab.html", button_state=button_state, services=services)
+        elif button_state==1:
+            filter_option = request.form.get("filter_option")
+            if filter_option=="name":
+                users = User.query.filter(User.name.ilike(f"%{search_text}%")).all()
+            elif filter_option=="email":
+                users = User.query.filter(User.email.ilike(f"%{search_text}%")).all()
+            elif filter_option=="service_type":
+                pro = Professional.query.join(Service).filter(Service.name.ilike(f"%{search_text}%")).all()
+                users = [x.user for x in pro]
+            else: # status
+                if search_text.lower() in ["inactive", "0", "blocked"]:
+                    search_text=0
+                else: #active
+                    search_text=1
+                users = User.query.filter(User.status.ilike(f"%{search_text}%")).all()
+            
+            return render_template("user_search_results.html", button_state=button_state, users=users)
+        else:
+            filter_option = request.form.get("filter_option")
+            if filter_option=="name":
+                requests = ServiceRequest.query.join(User).filter(User.name.ilike(f"%{search_text}%")).all()
+            elif filter_option=="pro_name":
+                pro = Professional.query.join(User).filter(User.name.ilike(f"%{search_text}%")).first()
+                requests = ServiceRequest.query.join(Professional).filter(Professional.id==pro.id).all()
+            elif filter_option=="address":
+                requests = ServiceRequest.query.join(User).filter(User.address.ilike(f"%{search_text}%")).all()
+            else: # status
+                if search_text.lower()=="requested":
+                    search_text=0
+                elif search_text.lower()=="accepted":
+                    search_text=1
+                else:
+                    search_text=3
+                requests = ServiceRequest.query.filter(ServiceRequest.status==search_text).all()
+                
+            return render_template("requests_tab.html", button_state=button_state, requests=requests)
+        
+
+    return redirect(url_for("admin_page", button_state=button_state))
+    
+
 
 # Services Tab page
 @app.route("/admin/services", methods=["GET", "POST"])
