@@ -59,9 +59,10 @@ class Professional(db.Model):
 
     # Ready for work 
     def ready_for_work(self):
-        service_request = ServiceRequest.query.filter(ServiceRequest.professional.id == self.id, ServiceRequest.status==1)
+        service_request = self.service_requests # Accepted jobs limited to 2
         if service_request:
-            return False
+            if len(service_request) > 2:
+                return False
         return True
 
 

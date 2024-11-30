@@ -45,20 +45,24 @@ def login_page():
 def user_info():
     if current_user.role==0:
         plot = get_plt_user_stats()
-        plot.savefig("./static/image/plots/users_summery.jpeg")
-        plot.clf()
+        if plot:
+            plot.savefig("./static/image/plots/users_summery.jpeg")
+            plot.clf()
 
         plot = get_plt_services_stats()
-        plot.savefig("./static/image/plots/services_summery.jpeg")
-        plot.clf()
+        if plot:
+            plot.savefig("./static/image/plots/services_summery.jpeg")
+            plot.clf()
     else:
         plot = get_plt_ratings()
-        plot.savefig("./static/image/plots/rating_summery.jpeg")
-        plot.clf()
+        if plot:
+            plot.savefig("./static/image/plots/rating_summery.jpeg")
+            plot.clf()
 
         plot = get_plt_service_rating()
-        plot.savefig("./static/image/plots/service_rating_summery.jpeg")
-        plot.clf()
+        if plot:
+            plot.savefig("./static/image/plots/service_rating_summery.jpeg")
+            plot.clf()
 
 
     return render_template("user_info.html")
@@ -327,7 +331,7 @@ def user_feedback_page(service_id):
             service_request.rating = rating
             service_request.remarks = remarks
             db.session.commit()
-            flash("Thankyou for your response.", category="info")
+            flash("Thank you for your response.", category="info")
 
             return redirect(url_for("user_requests_tab"))
         except:
@@ -359,16 +363,19 @@ def professional_page():
 # Accept request
 @app.route("/accept_request/<int:request_id>", methods=["GET", "POST"])
 def accept_request(request_id):
-    service_request = ServiceRequest.query.get(request_id)
-    service_request.professional_id = current_user.professional_info.id # Assigning the current professional to the job
-    service_request.status = 1 # changing the status to accepted
-    try:
-        db.session.commit()
-        flash("Job accepted successfuly.", category="info")
-        return redirect(url_for("professional_page"))
-    except:
-        db.session.rollback()
-        flash("Something went wrong! Job not assigned.", category="danger")
+    if current_user.professional_info.ready_for_work():
+        service_request = ServiceRequest.query.get(request_id)
+        service_request.professional_id = current_user.professional_info.id # Assigning the current professional to the job
+        service_request.status = 1 # changing the status to accepted
+        try:
+            db.session.commit()
+            flash("Job accepted successfuly.", category="info")
+            return redirect(url_for("professional_page"))
+        except:
+            db.session.rollback()
+            flash("Something went wrong! Job not assigned.", category="danger")
+    else:
+        flash("Accepted jobs limit reached.", category="danger")
 
     return redirect(url_for("professional_page"))
 
@@ -494,82 +501,90 @@ def get_plt_user_stats():
     customers = len(User.query.filter(User.role==1).all())
     professonals = len(User.query.filter(User.role==2).all())
 
-    if total_users > 0:
-        frac_cust = (customers/total_users)*100
-        frac_pro = (professonals/total_users)*100
-    else:
-        frac_cust = 0
-        frac_pro = 0
+    try:
+        if total_users > 0:
+            frac_cust = (customers/total_users)*100
+            frac_pro = (professonals/total_users)*100
+        else:
+            frac_cust = 0
+            frac_pro = 0
 
-    data = [frac_cust, frac_pro]
-    labels = ["Customers", "Professtionals"]
-    plt.pie(data, labels=labels, autopct='%1.1f%%')
-    plt.title("Users Summary")
-    return plt
+        data = [frac_cust, frac_pro]
+        labels = ["Customers", "Professtionals"]
+        plt.pie(data, labels=labels)
+        plt.title("Users Summary")
+        return plt
+    except:
+        pass
 
 # Services Stats
 def get_plt_services_stats():
     plt.style.use('dark_background')
 
-    # Services list
-    services_list = []
-    services_counts = [] # Numbers of requests of respective service type
-    services = Service.query.all()
-    for service in services:
-        services_list.append(service.name)
-        services_counts.append(len(service.service_requests))
+    try:
+        # Services list
+        services_list = []
+        services_counts = [] # Numbers of requests of respective service type
+        services = Service.query.all()
+        for service in services:
+            services_list.append(service.name)
+            services_counts.append(len(service.service_requests))
 
-    plt.bar(services_list, services_counts)
-    plt.title("Services Summary")
-    plt.xlabel("Services Type")
-    plt.ylabel("No. of requests")
-    return plt
+        plt.bar(services_list, services_counts)
+        plt.title("Services Summary")
+        plt.xlabel("Services Type")
+        plt.ylabel("No. of requests")
+        return plt
+    except:
+        pass
 
 #Ratings chart
 def get_plt_ratings():
     plt.style.use('dark_background')
 
 
-    rating = current_user.update_ratings()
+    try:
+        rating = current_user.update_ratings()
 
-    good = (rating/5)*100
-    bad = 100-good
+        good = (rating/5)*100
+        bad = 100-good
 
-    data = [good, bad]
-    labels = ["Good", "Bad"]
-    plt.pie(data, labels=labels)
-    plt.title(f"behaviour: {good}")
-    return plt
-
+        data = [good, bad]
+        labels = ["Good", "Bad"]
+        plt.pie(data, labels=labels)
+        plt.title(f"behaviour: {good}")
+        return plt
+    except:
+        pass
+    
 # Service rating
 def get_plt_service_rating():
-    if current_user.professional_info:
-        ser_reqs = current_user.professional_info.service_requests
-    else:
-        ser_reqs = current_user.service_requests
-
-    services_req_list = []
-    services_req_counts = []
-    for ser_req in ser_reqs:
-        services_req_list.append(str(ser_req.id))
-        if ser_req.rating:
-            services_req_counts.append(ser_req.rating)
+    try:
+        if current_user.professional_info:
+            ser_reqs = current_user.professional_info.service_requests
         else:
-            services_req_counts.append(0)
+            ser_reqs = current_user.service_requests
 
-    print("ids",services_req_list)
-    print("ratings", services_req_counts)
-    plt.bar(services_req_list, services_req_counts)
-    plt.title("Services Summary")
-    plt.xlabel("Service Request Id")
-    plt.ylabel("Rating")
-    return plt
+        services_req_list = []
+        services_req_counts = []
+        for ser_req in ser_reqs:
+            services_req_list.append(str(ser_req.id))
+            if ser_req.rating:
+                services_req_counts.append(ser_req.rating)
+            else:
+                services_req_counts.append(0)
 
-    
-    
-    
+        print("ids",services_req_list)
+        print("ratings", services_req_counts)
+        plt.bar(services_req_list, services_req_counts)
+        plt.title("Services Summary")
+        plt.xlabel("Service Request Id")
+        plt.ylabel("Rating")
+        return plt
+    except:
+        pass
 
 
-
+admin = User(email="manish@gmail.com", password="123456", role=0, name="Manish kumar", address="Nihal Vihar", pincode=110041)
 
 
