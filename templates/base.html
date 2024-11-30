@@ -23,15 +23,15 @@
                 <!-- End-->
                 {% if current_user.is_authenticated %}
                   <div>
-                    <a class="active" aria-current="page" href="{{ url_for('login_page') }}">Welcome, {{ current_user.capitalised_name() }}</a>
+                    <a class="active" href="{{ url_for('user_info') }}">Welcome, {{ current_user.capitalised_name() }}</a>
                     |
-                    <a class="active" aria-current="page" href="{{ url_for('logout') }}">Logout</a>
+                    <a class="active" href="{{ url_for('logout') }}">Logout</a>
                   </div>
                 {% else %}
                   <div>
-                    <a class="active" aria-current="page" href="{{ url_for('login_page') }}">Login</a>
+                    <a class="active"  href="{{ url_for('login_page') }}">Login</a>
                     |
-                    <a class="active" aria-current="page" href="{{ url_for('professional_signup_page') }}">Register As Professional</a>
+                    <a class="active"  href="{{ url_for('professional_signup_page') }}">Register As Professional</a>
                   </div>
                 {% endif %}
             </div>

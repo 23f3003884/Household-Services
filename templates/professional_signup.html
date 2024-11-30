@@ -11,7 +11,7 @@
             <span class="me-2" style="font-size: 30px;"> PROFESSIONAL SIGNUP</span>
             <img src="/static/image/icons/hammer.svg">
         </div>
-        <form action="/professional_registration" method="POST">
+        <form action="/professional_registration" method="POST" enctype="multipart/form-data">
             <div>
                 <!-- Email area -->
                 <div class="input-group mb-3">
@@ -49,14 +49,14 @@
                     <span class="input-group-text" id="basic-addon1">
                         <img src="/static/image/icons/calender.svg">
                     </span>
-                    <input name="experience" type="text" class="form-control" placeholder="Experience(in yrs)" required>
+                    <input name="experience" type="number" class="form-control" placeholder="Experience(in yrs)" required>
                 </div>
                 <!-- Upload Documnet -->
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="basic-addon1">
                         <img src="/static/image/icons/upload.svg">
                     </span>
-                    <input type="text" class="form-control" placeholder="Upload Documnet">
+                    <input name="uploaded_file" type="file" class="form-control" placeholder="photo.jpeg" accept=".jpeg" required>
                 </div>
                 <!-- Address -->
                 <div class="input-group mb-3">

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="text-center mt-2">{{current_user.capitalised_name()}}'s Details</h1>
+<div class="d-flex flex-column  align-items-center mt-3">
+    <!-- Service details -->
+    <form >
+        <div class="col input-group mb-2">
+            <span class="input-group-text width-140" >Name</span>
+            <input type="text" class="form-control" value="{{current_user.name}}" readonly>
+        </div>
+        <div class="col input-group mb-2">
+            <span class="input-group-text width-140" >Email</span>
+            <input type="text" class="form-control" value="{{current_user.email}}" readonly>
+        </div>    
+        {% if current_user.professional_info %}
+            <div class="col input-group mb-2">
+                <span class="input-group-text width-140" >Service Type</span>
+                <input type="text" class="form-control" value="{{current_user.professional_info.service.name}}" readonly>
+            </div>
+            <div class="col input-group mb-2">
+                <span class="input-group-text width-140" >Experience</span>
+                <input type="text" class="form-control" value="{{current_user.professional_info.experience}}" readonly>
+            </div>
+        {% endif %}
+        <div class="col input-group mb-2">
+            <span class="input-group-text width-140" >Address</span>
+            <textarea type="text" class="form-control" readonly>{{current_user.address}}</textarea>
+        </div>
+        <div class="col input-group mb-2">
+            <span class="input-group-text width-140" >Pin Code</span>
+            <input type="text" class="form-control" value="{{current_user.pincode}}" readonly>
+        </div>
+        <div class="col input-group mb-2">
+            <span class="input-group-text width-140" >Rating</span>
+            <input type="text" class="form-control" value="{{current_user.rating}}" readonly>
+        </div>
+        
+    </form>
+    <div class="h1">Summary</div>
+    {% if current_user.role==0%}
+    <div class="d-flex" >
+        <img src="./static/image/plots/users_summery.jpeg" >
+        <img src="./static/image/plots/services_summery.jpeg" >
+    </div>
+    {% else %}
+        <div class="d-flex">
+            <img src="./static/image/plots/rating_summery.jpeg" >
+            <img src="./static/image/plots/service_rating_summery.jpeg" >
+        </div>
+
+    {% endif%}
+    
+    
+</div>
+
+{% endblock %}

@@ -21,7 +21,11 @@
         {% for user in users %}
             <tr>
                 {% if user.professional_info and user.status==0%}
-                    <th scope="row">{{user.id}}</th>
+                    <th scope="row">
+                        <a href="{{url_for('show_photo', user_id=user.id)}}">
+                            {{user.id}}
+                        </a>
+                    </th>
                     <td>{{user.capitalised_name()}}</td>
                     <td>{{user.email}}</td>
                     <td>{{user.professional_info.service.name}}</td>
@@ -57,19 +61,7 @@
         <th scope="col">Rating</th>
         <th scope="col">Active</th>
       </tr>
-      <!--
-       <tr>
-        <th scope="col">#</th>
-        <th scope="col">Professional Name</th>
-        <th scope="col">Email</th>
-        <th scope="col">Service Type</th>
-        <th scope="col">Experience</th>
-        <th scope="col">Address</th>
-        <th scope="col">Pin Code</th>
-        <th scope="col">Rating</th>
-        <th scope="col">Active</th>
-      </tr>
-      -->
+      
     </thead>
     <tbody>
         <!-- Here profesional is an object of User modal-->
@@ -80,6 +72,7 @@
                 <td>{{user.email}}</td>
                 <td>{{user.address}}</td>
                 <td>{{user.pincode}}</td>
+                {{ user.update_ratings()}}
                 <td>{{user.rating}}</td> <!-- Using relation professional_info described on User modal-->
                 <td>
                     <form action="{{ url_for('status_changer', user_id=user.id)}}", method="POST">

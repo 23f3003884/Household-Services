@@ -3,13 +3,15 @@ from flask_login import login_user, logout_user, current_user, login_required
 from flask import current_app as app
 from backend.modals import *
 from sqlalchemy import or_
+import matplotlib.pyplot as plt
 
 # Home page
 @app.route("/")
 def home_page():
     return render_template('index.html')
 
-#pending: restrict access to inactive users
+
+
 # Login page
 @app.route("/login", methods=["GET", "POST"])
 def login_page():
@@ -20,20 +22,46 @@ def login_page():
         usr = User.query.filter_by(email=email).first()
         if usr:
             if usr.password == password:
-                login_user(usr) # added user to app session
-                # Separating users based on their roles
-                if usr.role == 0:
-                    return redirect(url_for("admin_page", button_state=0))
-                elif usr.role == 1:
-                    return redirect(url_for("user_page", button_state=1))
+                if usr.status:
+                    login_user(usr) # added user to app session
+                    # Separating users based on their roles
+                    if usr.role == 0:
+                        return redirect(url_for("admin_page", button_state=0))
+                    elif usr.role == 1:
+                        return redirect(url_for("user_page", button_state=1))
+                    else:
+                        return redirect(url_for("professional_page"))
                 else:
-                    return redirect(url_for("professional_page"))
+                    flash("Account is blocked/under verification. Contact admin for support(manish@gmail.com).", category="danger")
             else:
                 flash("Wrong password.", category="danger")
         else:
             flash("Invalid email address.", category="danger")
 
     return render_template("login.html")
+
+# User Summary/info
+@app.route("/user_info")
+def user_info():
+    if current_user.role==0:
+        plot = get_plt_user_stats()
+        plot.savefig("./static/image/plots/users_summery.jpeg")
+        plot.clf()
+
+        plot = get_plt_services_stats()
+        plot.savefig("./static/image/plots/services_summery.jpeg")
+        plot.clf()
+    else:
+        plot = get_plt_ratings()
+        plot.savefig("./static/image/plots/rating_summery.jpeg")
+        plot.clf()
+
+        plot = get_plt_service_rating()
+        plot.savefig("./static/image/plots/service_rating_summery.jpeg")
+        plot.clf()
+
+
+    return render_template("user_info.html")
 
 
 # Admin dashboard
@@ -73,7 +101,7 @@ def admin_search():
                     search_text=1
                 users = User.query.filter(User.status.ilike(f"%{search_text}%")).all()
             
-            return render_template("user_search_results.html", button_state=button_state, users=users)
+            return render_template("admin_user_search_results.html", button_state=button_state, users=users)
         else:
             filter_option = request.form.get("filter_option")
             if filter_option=="name":
@@ -114,6 +142,12 @@ def users_tab_page():
     users = User.query.filter(or_(User.role==1, User.role==2))
     return render_template("users_tab.html", button_state=button_state, users=users)
 
+# Show professional photo
+@app.route("/admin/photo")
+def show_photo():
+    user_id = request.args.get("user_id", type=int)
+    path =  f"image/uploads/{user_id}.jpeg"
+    return render_template("photo.html", path=path)
 
 # Requests Tab page
 @app.route("/admin/requests", methods=["GET", "POST"])
@@ -206,6 +240,23 @@ def user_page(button_state): # button_state: 0:user_requests_tab, 1:user_service
         return redirect(url_for("user_services_tab"))
     else:
         return redirect(url_for("user_requests_tab"))
+    
+# Search funtionality
+@app.route("/user/search", methods=["GET", "POST"])
+def user_search():
+    button_state=request.args.get("button_state", type=int)
+    if request.method=="POST":
+        search_text = request.form.get("search_text")
+        filter_option = request.form.get("filter_option")
+        if button_state==1:
+            if filter_option=="name":
+                services = Service.query.filter(Service.name.ilike(f"%{search_text}%")).all()
+            else:
+                services = Service.query.filter(Service.desc.ilike(f"%{search_text}%")).all()
+
+            return render_template("user_services_tab.html", button_state=button_state, services=services)
+
+    return redirect(url_for("user_page", button_state=button_state))
 
 # User services tab
 @app.route("/user/services", methods=["GET", "POST"])
@@ -389,20 +440,30 @@ def professional_registration_page():
         address = request.form.get("address")
         pincode = request.form.get("pincode")
         status = 0
+
         # Setting up new user
         try:
             # First creating a user then using it id to make a professional
             new_user = User(email=email, password=password, name=name, address=address, pincode=pincode, role=role, status=status)
             db.session.add(new_user)
             db.session.flush() # To get user.id 
+            #Creating photo url with user_id
+            file = request.files["uploaded_file"]
+            if file.filename:
+                url = f"./static/image/uploads/{new_user.id}.jpeg"
+                file.save(url)
             # professional created
             new_pro = Professional(user_id=new_user.id, service_type=service_type, experience=experience)
             db.session.add(new_pro)
             db.session.commit()
+
+            
+
             flash("Professional account created successfuly", category="info")
 
             return redirect(url_for("login_page"))
-        except:
+        except Exception as e:
+            print(e)
             db.session.rollback()
             flash("Something went wrong. Try again!!!", category="danger")
 
@@ -424,3 +485,91 @@ def logout():
 def get_service_obj(service_id):
     obj = Service.query.filter_by(id=service_id).first()
     return obj
+
+# Numbers of Customers and Users on website
+def get_plt_user_stats():
+    plt.style.use('dark_background')
+
+    total_users = len(User.query.filter(or_(User.role==1,User.role==2)).all())
+    customers = len(User.query.filter(User.role==1).all())
+    professonals = len(User.query.filter(User.role==2).all())
+
+    if total_users > 0:
+        frac_cust = (customers/total_users)*100
+        frac_pro = (professonals/total_users)*100
+    else:
+        frac_cust = 0
+        frac_pro = 0
+
+    data = [frac_cust, frac_pro]
+    labels = ["Customers", "Professtionals"]
+    plt.pie(data, labels=labels, autopct='%1.1f%%')
+    plt.title("Users Summary")
+    return plt
+
+# Services Stats
+def get_plt_services_stats():
+    plt.style.use('dark_background')
+
+    # Services list
+    services_list = []
+    services_counts = [] # Numbers of requests of respective service type
+    services = Service.query.all()
+    for service in services:
+        services_list.append(service.name)
+        services_counts.append(len(service.service_requests))
+
+    plt.bar(services_list, services_counts)
+    plt.title("Services Summary")
+    plt.xlabel("Services Type")
+    plt.ylabel("No. of requests")
+    return plt
+
+#Ratings chart
+def get_plt_ratings():
+    plt.style.use('dark_background')
+
+
+    rating = current_user.update_ratings()
+
+    good = (rating/5)*100
+    bad = 100-good
+
+    data = [good, bad]
+    labels = ["Good", "Bad"]
+    plt.pie(data, labels=labels)
+    plt.title(f"behaviour: {good}")
+    return plt
+
+# Service rating
+def get_plt_service_rating():
+    if current_user.professional_info:
+        ser_reqs = current_user.professional_info.service_requests
+    else:
+        ser_reqs = current_user.service_requests
+
+    services_req_list = []
+    services_req_counts = []
+    for ser_req in ser_reqs:
+        services_req_list.append(str(ser_req.id))
+        if ser_req.rating:
+            services_req_counts.append(ser_req.rating)
+        else:
+            services_req_counts.append(0)
+
+    print("ids",services_req_list)
+    print("ratings", services_req_counts)
+    plt.bar(services_req_list, services_req_counts)
+    plt.title("Services Summary")
+    plt.xlabel("Service Request Id")
+    plt.ylabel("Rating")
+    return plt
+
+    
+    
+    
+
+
+
+
+

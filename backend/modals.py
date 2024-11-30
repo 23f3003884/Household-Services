@@ -31,7 +31,21 @@ class User(db.Model, UserMixin):
             self.rating = 0
         self.rating = int((self.rating + rating)/2)
 
-    # Pending: Funtion to update ratings of professionals 
+    # Funtion to update ratings of professionals 
+    def update_ratings(self):
+        if self.professional_info:
+            ser_reqs = self.professional_info.service_requests
+            number_of_services_req = len(ser_reqs)
+            rating = 0
+            for ser_req in ser_reqs:
+                if ser_req.rating:
+                    rating += ser_req.rating
+            if number_of_services_req:
+                self.rating = rating//number_of_services_req
+            db.session.commit()
+
+        return self.rating
+
 
 
 class Professional(db.Model):
