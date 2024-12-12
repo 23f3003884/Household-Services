@@ -72,7 +72,8 @@
                 <td>{{user.email}}</td>
                 <td>{{user.address}}</td>
                 <td>{{user.pincode}}</td>
-                {{ user.update_ratings()}}
+                
+                <div hidden> {{ user.update_ratings() }} </div>
                 <td>{{user.rating}}</td> <!-- Using relation professional_info described on User modal-->
                 <td>
                     <form action="{{ url_for('status_changer', user_id=user.id)}}", method="POST">

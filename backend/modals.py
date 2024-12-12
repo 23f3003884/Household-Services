@@ -44,7 +44,6 @@ class User(db.Model, UserMixin):
                 self.rating = rating//number_of_services_req
             db.session.commit()
 
-        return self.rating
 
 
 
@@ -89,7 +88,7 @@ class ServiceRequest(db.Model):
     start_date = db.Column(db.DateTime(), nullable=False, default=datetime.now().replace(microsecond=0)) # datetime.now():get current time
     end_date = db.Column(db.DateTime())
     status = db.Column(db.Integer(), nullable=False, default=0) # 0-requested, 1-accepted, 2-completed at users-end, 3-completed at professionals-end
-    rating = db.Column(db.Integer()) # Mandatory to give ratings for closing the job
+    rating = db.Column(db.Integer()) # Mandatory to give ratings for closing the job/tasks
     remarks = db.Column(db.String(500))
     # Relations
     professional = db.relationship("Professional", backref="service_requests", lazy=True)

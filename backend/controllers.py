@@ -118,7 +118,7 @@ def admin_search():
             else: # status
                 if search_text.lower()=="requested":
                     search_text=0
-                elif search_text.lower()=="accepted":
+                elif search_text.lower()=="accepted": 
                     search_text=1
                 else:
                     search_text=3
@@ -281,7 +281,6 @@ def create_request(service_id):
 
         return redirect(url_for("user_services_tab"))
     except Exception as e:
-        print(e)
         db.session.rollback()
 
         flash("Service request failed.", category="danger")
@@ -343,7 +342,6 @@ def user_feedback_page(service_id):
 # Service request full info page
 @app.route("/service_request_info/<int:id>")
 def service_request_info(id):
-    print(type(id))
     service_request = ServiceRequest.query.get(id)
     return render_template("service_request_info.html", service_request=service_request)
 
@@ -470,7 +468,6 @@ def professional_registration_page():
 
             return redirect(url_for("login_page"))
         except Exception as e:
-            print(e)
             db.session.rollback()
             flash("Something went wrong. Try again!!!", category="danger")
 
@@ -574,8 +571,6 @@ def get_plt_service_rating():
             else:
                 services_req_counts.append(0)
 
-        print("ids",services_req_list)
-        print("ratings", services_req_counts)
         plt.bar(services_req_list, services_req_counts)
         plt.title("Services Summary")
         plt.xlabel("Service Request Id")
@@ -585,6 +580,6 @@ def get_plt_service_rating():
         pass
 
 
-admin = User(email="manish@gmail.com", password="123456", role=0, name="Manish kumar", address="Nihal Vihar", pincode=110041)
+#admin = User(email="manish@gmail.com", password="123456", role=0, name="Manish kumar", address="Nihal Vihar", pincode=110041)
 
 

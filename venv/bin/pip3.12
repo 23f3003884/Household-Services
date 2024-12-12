@@ -1,4 +1,4 @@
-#!/home/manish/Documents/Coding/Collage-code/Projects/Household-Services/venv/bin/python3
+#!/home/manish/Documents/Coding/Collage-code/Projects/Household-Services/venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
