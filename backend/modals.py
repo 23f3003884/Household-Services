@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.sql import func
+from sqlalchemy import CheckConstraint
 from flask_login import UserMixin
 from datetime import datetime
 
@@ -16,6 +16,9 @@ class User(db.Model, UserMixin):
     pincode = db.Column(db.Integer(), nullable=False)
     status = db.Column(db.Integer(), nullable=False, default=1) # 0-inactive, 1-active
     rating = db.Column(db.Integer(), default=0)
+    age = db.Column(db.Integer(), nullable=True) # newly added
+
+    __table_args__ = (CheckConstraint("rating > 2", name="check_rating"),)
         
     # Relations
     service_requests = db.relationship("ServiceRequest", cascade="all, delete", backref="customer", lazy=True) # For accessing all the service requests created by a user(customer)
